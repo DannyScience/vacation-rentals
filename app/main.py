@@ -7,13 +7,13 @@ from pydantic import BaseModel
 app = FastAPI()
 
 
-class SRental(BaseModel):
+class SHotel(BaseModel):
     adress: str
     name: str
     stars: int
 
 
-class RentalsSearchArgs:
+class HotelSearchArgs:
     def __init__(
         self,
         location: str,
@@ -27,9 +27,9 @@ class RentalsSearchArgs:
         self.stars = stars
 
 
-@app.get('/rentals')
-def get_rentals(
-        search_args: RentalsSearchArgs = Depends()
+@app.get('/hotels')
+def get_hotels(
+        search_args: HotelSearchArgs = Depends()
 ):
     return search_args
 
