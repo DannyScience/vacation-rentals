@@ -1,7 +1,8 @@
 from datetime import date
+from sqlalchemy import and_, delete, func, insert, or_, select
 
-from sqlalchemy import and_, func, insert, or_, select
 from app.bookings.models import Bookings
+from app.exceptions import UserNotEnoughPermissions
 from app.hotels.rooms.models import Rooms
 from app.services.base import BaseDAO
 from app.database import async_session_maker, engine
@@ -80,3 +81,37 @@ class BookingDAO(BaseDAO):
                 await session.commit()
                 
                 return new_booking_id.scalar()
+    
+    
+    @classmethod
+    async def delete_booking(
+        cls,
+        booking_id: int,
+        user_id: int
+    ):
+        async with async_session_maker() as session:
+            get_user_id = select(Bookings.user_id).filter_by(id=booking_id)
+            db_user_id = await session.execute(get_user_id)
+            db_user_id: int = db_user_id.scalar()
+
+            if db_user_id != user_id:
+                raise UserNotEnoughPermissions
+            
+            query = delete(Bookings).where(Bookings.id == booking_id)
+            await session.execute(query)
+            await session.commit()
+        
+        
+    @classmethod
+    async def find_all(cls, user_id: int):
+        async with async_session_maker() as session:
+            query = select(Bookings).filter_by(user_id=user_id)
+            result = await session.execute(query)
+            data = result.scalars().all()
+            print(data)
+            print(type(data))
+            "need to make custom sql request"
+            
+             
+        
+        

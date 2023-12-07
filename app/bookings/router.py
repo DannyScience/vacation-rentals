@@ -1,5 +1,7 @@
 from datetime import date
+from typing import List
 from fastapi import APIRouter, Depends, Request
+from pydantic import BaseModel
 
 from app.bookings.dao import BookingDAO
 from app.bookings.schemas import SBooking
@@ -14,8 +16,20 @@ router = APIRouter(
     ) 
 
 
+class BookingsList(BaseModel):
+    id: int
+    room_id: int
+    user_id: int
+    date_from: date
+    date_to: date
+    price: int
+    total_cost: int
+    total_days: int
+    
+    
+
 @router.get('')
-async def get_bookings(user: Users = Depends(get_current_user)):
+async def get_bookings(user: Users = Depends(get_current_user)):# -> List[BookingsList]:
     return await BookingDAO.find_all(user_id=user.id)
 
 
@@ -27,3 +41,11 @@ async def add_booking(
     booking = await BookingDAO.add(user.id, room_id, date_from, date_to)
     if not booking:
         raise RoomCannotBeBooked
+
+
+@router.delete('/{booking_id}')
+async def delete_booking(
+    booking_id: int,
+    user: Users = Depends(get_current_user)
+):
+    await BookingDAO.delete_booking(booking_id, user.id)
