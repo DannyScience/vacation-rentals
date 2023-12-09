@@ -9,3 +9,8 @@ from app.database import async_session_maker, engine
 
 class BookingDAO(BaseDAO):
     model = Bookings
+
+    @classmethod
+    async def find_all():
+        pass
+    

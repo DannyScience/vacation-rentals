@@ -102,15 +102,15 @@ class BookingDAO(BaseDAO):
             await session.commit()
         
         
-    @classmethod
-    async def find_all(cls, user_id: int):
-        async with async_session_maker() as session:
-            query = select(Bookings).filter_by(user_id=user_id)
-            result = await session.execute(query)
-            data = result.scalars().all()
-            print(data)
-            print(type(data))
-            "need to make custom sql request"
+    # @classmethod
+    # async def find_all(cls, user_id: int):
+    #     async with async_session_maker() as session:
+    #         query = select(Bookings).filter_by(user_id=user_id)
+    #         result = await session.execute(query)
+    #         data = result.scalars().all()
+    #         print(data)
+    #         print(type(data))
+    #         "need to make custom sql request"
             
              
         
