@@ -21,10 +21,6 @@ class HotelDAO(BaseDAO):
         date_to: date,
     ):
         """
-        -- location = "Алтай"
-        -- date_from = "2023-05-15"
-        -- date_to = "2023-06-20"
-
         with booked_rooms as (
             select hotel_id, count(*) as already_booked
             from bookings

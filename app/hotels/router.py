@@ -1,6 +1,9 @@
+import asyncio
 from datetime import date, timedelta, datetime
 from typing import Annotated
 from fastapi import APIRouter, Query
+from fastapi_cache.decorator import cache
+from pydantic import parse_obj_as
 
 from app.hotels.dao import HotelDAO
 from app.hotels.schemas import SHotels, SHotelsInfo
@@ -14,6 +17,7 @@ router = APIRouter(
 
 
 @router.get('')
+@cache(expire=60)
 async def get_hotels_by_location_and_time(
     location: Annotated[
         str,
@@ -27,13 +31,17 @@ async def get_hotels_by_location_and_time(
     date_to: Annotated[
         date, Query(description=f"Ex, {datetime.now().date()}")
     ] = ...,
-) -> list[SHotelsInfo]:
+):
+    await asyncio.sleep(3)
     if date_from > date_to:
         raise BackToTheFuture
     if date_to - date_from > timedelta(days=30):
         raise TooLongBooking
+    
+    hotels = await HotelDAO.find_all(location, date_from, date_to)
+    hotels_json = parse_obj_as(list[SHotelsInfo], hotels)
 
-    return await HotelDAO.find_all(location, date_from, date_to)
+    return hotels_json
 
 
 @router.get('/id/{hotel_id}')
