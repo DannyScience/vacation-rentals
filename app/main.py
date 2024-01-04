@@ -50,30 +50,3 @@ app.add_middleware(
 def startup():
     redis = aioredis.from_url('redis://localhost:6379')
     FastAPICache.init(RedisBackend(redis), prefix='cache')
-
-
-
-
-
-
-
-
-class HotelSearchArgs:
-    def __init__(
-        self,
-        location: str,
-        date_from: date,
-        date_to: date,
-        stars: Optional[int] = Query(None, ge=1, le=5)
-    ):
-        self.location = location
-        self.date_from = date_from
-        self.date_to = date_to
-        self.stars = stars
-
-
-@app.get('/hotels_main')
-def get_hotels(
-        search_args: HotelSearchArgs = Depends()
-):
-    return search_args
